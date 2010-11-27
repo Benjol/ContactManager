@@ -1,0 +1,266 @@
+﻿<Window
+	xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+	xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+	x:Class="ContactManager.MainWindow"
+	Title="Contact Manager" Height="{local:SettingBinding Path=WindowHeight}" Width="{local:SettingBinding Path=WindowWidth}" 
+	xmlns:d="http://schemas.microsoft.com/expression/blend/2008" 
+	xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006" mc:Ignorable="d" 
+	Loaded="Window_Loaded" Closing="Window_Closing"
+	xmlns:local="clr-namespace:ContactManager"
+	xmlns:data="clr-namespace:ContactManager.Data"
+	Icon="pack://application:,,,/Resources/ContactManager.ico" MinWidth="800" MinHeight="500"
+	FontFamily="Tahoma" x:Name="this" 
+	KeyUp="listView_KeyUp" KeyDown="this_KeyDown">
+	<Window.Resources>
+		<local:DateConverter x:Key="dateConverter"/>
+		<Style TargetType="{x:Type StackPanel}" x:Key="CollapseIfOnePerson">
+			<Style.Triggers>
+				<DataTrigger Binding="{Binding Path=People.Count}" Value="1">
+					<Setter Property="Visibility" Value="Collapsed" />
+				</DataTrigger>
+			</Style.Triggers>
+		</Style>
+		<Style TargetType="{x:Type TextBlock}" x:Key="CollapseIfEmpty">
+			<Style.Triggers>
+				<DataTrigger Binding="{Binding Text, RelativeSource={RelativeSource Self}}" Value="">
+					<Setter Property="Visibility" Value="Collapsed" />
+				</DataTrigger>
+			</Style.Triggers>
+		</Style>
+		<Style TargetType="{x:Type TextBlock}" x:Key="CollapseIfEmailEmpty">
+			<Style.Triggers>
+				<DataTrigger Binding="{Binding Path=Email}" Value="">
+					<Setter Property="Visibility" Value="Collapsed" />
+				</DataTrigger>
+			</Style.Triggers>
+		</Style>
+		<Style TargetType="{x:Type TextBlock}" x:Key="ShowIfOnePersonMobile">
+			<Setter Property="Visibility" Value="Collapsed"/>
+			<Style.Triggers>
+				<DataTrigger Binding="{Binding Path=People.Count}" Value="1">
+					<Setter Property="Visibility" Value="Visible" />
+				</DataTrigger>
+				<DataTrigger Binding="{Binding People/MobileNumber}" Value="">
+					<Setter Property="Visibility" Value="Collapsed" />
+				</DataTrigger>
+			</Style.Triggers>
+		</Style>
+		<Style TargetType="{x:Type TextBlock}" x:Key="ShowIfOnePersonBirthday">
+			<Setter Property="Visibility" Value="Collapsed"/>
+			<Style.Triggers>
+				<DataTrigger Binding="{Binding Path=People.Count}" Value="1">
+					<Setter Property="Visibility" Value="Visible" />
+				</DataTrigger>
+				<DataTrigger Binding="{Binding People/DateOfBirth}" Value="{x:Null}">
+					<Setter Property="Visibility" Value="Collapsed" />
+				</DataTrigger>
+			</Style.Triggers>
+		</Style>
+
+	</Window.Resources>
+	<Grid DataContext="{Binding Path=Contacts}" Margin="0">
+		<Grid.ColumnDefinitions>
+			<ColumnDefinition Width="581*" />
+			<ColumnDefinition Width="282*" />
+		</Grid.ColumnDefinitions>
+		<Grid.RowDefinitions>
+			<RowDefinition Height="24" />
+			<RowDefinition Height="36" />
+			<RowDefinition Height="417*" />
+			<RowDefinition Height="37" />
+		</Grid.RowDefinitions>
+		<Menu Height="23" Name="menu1" Padding="0"  VerticalAlignment="Top" Background="LightGray" BorderThickness="0" Grid.ColumnSpan="2">
+			<MenuItem Header="_File" Width="50">
+				<MenuItem Header="_New" Click="New_Click"/>
+				<MenuItem Header="_Open..." Click="FileOpen_Click"/>
+				<MenuItem Header="_Save" Click="Save_Click"/>
+				<MenuItem Header="Save _As..." Click="SaveAs_Click"/>
+				<Separator/>
+				<MenuItem Header="_Close" Click="Close_Click"/>
+			</MenuItem>
+			<MenuItem Header="_Edit" Width="50">
+				<MenuItem IsEnabled="{Binding ElementName=this, Path=UndoRedo.CanUndo}" Click="Undo_Click">
+					<MenuItem.Header>
+						<StackPanel Orientation="Horizontal">
+							<Label Margin="0" Padding="0" Content="_Undo " />
+							<Label Margin="0" Padding="0" Content="{Binding ElementName=this, Path=UndoRedo.NextUndoAction}"/>
+						</StackPanel>
+					</MenuItem.Header>
+				</MenuItem>
+				<MenuItem IsEnabled="{Binding ElementName=this, Path=UndoRedo.CanRedo}" Click="Redo_Click">
+					<MenuItem.Header>
+						<StackPanel Orientation="Horizontal">
+							<Label Margin="0" Padding="0" Content="_Redo "/>
+							<Label Margin="0" Padding="0" Content="{Binding ElementName=this, Path=UndoRedo.NextRedoAction}"/>
+						</StackPanel>
+					</MenuItem.Header>
+				</MenuItem>
+			</MenuItem>
+			<MenuItem Header="_Import" Width="80">
+				<MenuItem Header="_AddressBook xml..." Click="ImportAddressBook_Click"/>
+				<MenuItem Header="_Generic csv..." Click="ImportGenericCsv_Click"/>
+				<MenuItem Header="_Outlook csv..." Click="ImportOutlookCsv_Click"/>
+			</MenuItem>
+			<MenuItem Header="_Export" Width="80">
+				<MenuItem Header="_AddressBook xml..." Click="ExportAddressBook_Click"/>
+				<MenuItem Header="_Phone List..." Click="ExportPhoneCsv_Click"/>
+				<MenuItem Header="E_mail List..." Click="ExportEmailCsv_Click"/>
+				<MenuItem Header="_Address List..." Click="ExportAddressCsv_Click"/>
+				<MenuItem Header="_Birthday List..." Click="ExportBirthdayCsv_Click"/>
+			</MenuItem>
+			<MenuItem Header="_Tools" Width="80">
+				<MenuItem Header="_Options..." IsEnabled="False" Click="Options_Click"/>
+				<MenuItem Header="_Birthdays..." Click="Birthdays_Click" />
+			</MenuItem>
+			<MenuItem Header="_Help" Width="80" >
+				<MenuItem Header="_Description" Click="HelpDescription_Click"/>
+				<MenuItem Header="_About" Click="About_Click"/>
+			</MenuItem>
+		</Menu>
+		<ListView Name="listView"  IsSynchronizedWithCurrentItem="True" Margin="5,5,5,5" ItemsSource="{Binding}"
+				  ItemContainerStyle="{DynamicResource CustomListViewItemStyle}" AlternationCount="2" KeyUp="listView_KeyUp"
+				  IsEnabled="True" Grid.Row="1" Grid.RowSpan="2" MouseDoubleClick="listView_MouseDoubleClick">
+			<ListView.View>
+				<GridView>
+					<GridViewColumn Header="Name" DisplayMemberBinding="{Binding OrderByName}" Width="{local:SettingBinding Path=NameColWidth}" />
+					<GridViewColumn Header="Phone" DisplayMemberBinding="{Binding PhoneNumber}" Width="{local:SettingBinding Path=PhoneColWidth}" />
+					<GridViewColumn Header="Email" DisplayMemberBinding="{Binding Email}" Width="{local:SettingBinding Path=EmailColWidth}" />
+				</GridView>
+			</ListView.View>
+		</ListView>
+
+		<Button HorizontalAlignment="Left" Margin="5,8,0,5" Name="btnDetail" Width="75" Click="btnDetail_Click" Grid.Row="1" Grid.Column="1">Detail...</Button>
+		<Button HorizontalAlignment="Right" Margin="0,7,12,6" Name="btnNew" Width="47" Click="btnNew_Click" Grid.Row="1" Grid.Column="1">New...</Button>
+		<Button HorizontalAlignment="Right" Margin="0,7,65,6" Name="btnEdit" Width="47" Click="btnEdit_Click" Grid.Row="1" Grid.Column="1">Edit...</Button>
+
+		<ScrollViewer Margin="5,5,5,5" VerticalScrollBarVisibility="Auto" Grid.Row="2" Grid.Column="1" Grid.RowSpan="2">
+			<StackPanel Name="grid1" TextBlock.FontSize="15">
+				<TextBlock Style="{DynamicResource CollapseIfEmpty}" Text="{Binding DisplayName}" FontWeight="Bold" TextWrapping="Wrap"></TextBlock>
+				<TextBlock Style="{DynamicResource CollapseIfEmpty}" Text="{Binding Address}" TextWrapping="Wrap"></TextBlock>
+				<TextBlock Style="{DynamicResource CollapseIfEmpty}" Text="{Binding PhoneNumber}"></TextBlock>
+				<TextBlock Style="{DynamicResource CollapseIfEmailEmpty}"><Hyperlink NavigateUri="{Binding Email}" RequestNavigate="Hyperlink_RequestNavigate"><TextBlock Style="{DynamicResource CollapseIfEmpty}" Text="{Binding Email}"/></Hyperlink></TextBlock>
+				<TextBlock Style="{DynamicResource ShowIfOnePersonMobile}" Text="{Binding People/MobileNumber}"/>
+				<TextBlock Style="{DynamicResource ShowIfOnePersonBirthday}" Text="{Binding People/DateOfBirth, Converter={StaticResource dateConverter}, ConverterParameter='dd MMM yyyy'}"/>
+				<TextBlock Style="{DynamicResource CollapseIfEmpty}" Text="{Binding Notes}" FontSize="11" TextWrapping="Wrap" Padding="5" Foreground="DimGray"></TextBlock>
+
+				<StackPanel Style="{DynamicResource CollapseIfOnePerson}" Margin="0">
+					<Label VerticalAlignment="Bottom" FontWeight="Bold" FontSize="11" Margin="0">Mobile Numbers</Label>
+					<ListView Name="listView1" Margin="0" ItemsSource="{Binding People}" FontSize="11" BorderThickness="0">
+						<ListView.ItemContainerStyle>
+							<Style TargetType="{x:Type ListViewItem}">
+								<Style.Triggers>
+									<DataTrigger Binding="{Binding MobileNumber}" Value="">
+										<Setter Property="Visibility" Value="Collapsed"/>
+									</DataTrigger>
+								</Style.Triggers>
+							</Style>
+						</ListView.ItemContainerStyle>
+						<ListView.View>
+							<GridView ColumnHeaderContainerStyle="{DynamicResource noHeaderStyle}">
+								<GridViewColumn Header="Name" DisplayMemberBinding="{Binding FirstName}" Width="80"/>
+								<GridViewColumn Header="Mobile" DisplayMemberBinding="{Binding MobileNumber}" Width="170"/>
+							</GridView>
+						</ListView.View>
+					</ListView>
+				</StackPanel>
+
+				<StackPanel Style="{DynamicResource CollapseIfOnePerson}" Margin="0">
+					<Label VerticalAlignment="Bottom" FontWeight="Bold" FontSize="11" Margin="0">Work Numbers</Label>
+					<ListView Name="listView4" Margin="0" ItemsSource="{Binding People}" FontSize="11" BorderThickness="0">
+						<ListView.ItemContainerStyle>
+							<Style TargetType="{x:Type ListViewItem}">
+								<Style.Triggers>
+									<DataTrigger Binding="{Binding WorkNumber}" Value="">
+										<Setter Property="Visibility" Value="Collapsed"/>
+									</DataTrigger>
+								</Style.Triggers>
+							</Style>
+						</ListView.ItemContainerStyle>
+						<ListView.View>
+							<GridView ColumnHeaderContainerStyle="{DynamicResource noHeaderStyle}">
+								<GridViewColumn Header="Name" DisplayMemberBinding="{Binding FirstName}" Width="80"/>
+								<GridViewColumn Header="Mobile" DisplayMemberBinding="{Binding WorkNumber}" Width="170"/>
+							</GridView>
+						</ListView.View>
+					</ListView>
+				</StackPanel>
+
+				<StackPanel Style="{DynamicResource CollapseIfOnePerson}" Margin="0">
+					<Label VerticalAlignment="Bottom" FontWeight="Bold" FontSize="11" Margin="0">Email addresses</Label>
+					<ListView Name="listView2" Margin="0" ItemsSource="{Binding People}" FontSize="11" BorderThickness="0">
+						<ListView.ItemContainerStyle>
+							<Style TargetType="{x:Type ListViewItem}">
+								<Style.Triggers>
+									<DataTrigger Binding="{Binding Email}" Value="">
+										<Setter Property="Visibility" Value="Collapsed"/>
+									</DataTrigger>
+								</Style.Triggers>
+							</Style>
+						</ListView.ItemContainerStyle>
+						<ListView.View>
+							<GridView ColumnHeaderContainerStyle="{DynamicResource noHeaderStyle}">
+								<GridViewColumn Header="Name" DisplayMemberBinding="{Binding FirstName}" Width="80"/>
+								<GridViewColumn Header="Email" Width="170">
+									<GridViewColumn.CellTemplate>
+										<DataTemplate>
+											<TextBlock>
+												<Hyperlink NavigateUri="{Binding Email}" RequestNavigate="Hyperlink_RequestNavigate">
+													<TextBlock Text="{Binding Email}"/>
+												</Hyperlink>
+											</TextBlock>
+										</DataTemplate>
+									</GridViewColumn.CellTemplate>
+								</GridViewColumn>
+							</GridView>
+						</ListView.View>
+					</ListView>
+				</StackPanel>
+
+				<StackPanel Style="{DynamicResource CollapseIfOnePerson}" Margin="0">
+					<Label VerticalAlignment="Bottom" FontWeight="Bold" FontSize="11" Margin="0">Birthdays</Label>
+					<ListView Name="listView3" Margin="0" ItemsSource="{Binding People}" FontSize="11" BorderThickness="0">
+						<ListView.ItemContainerStyle>
+							<Style TargetType="{x:Type ListViewItem}">
+								<Style.Triggers>
+									<DataTrigger Binding="{Binding DateOfBirth}" Value="{x:Null}">
+										<Setter Property="Visibility" Value="Collapsed"/>
+									</DataTrigger>
+								</Style.Triggers>
+							</Style>
+						</ListView.ItemContainerStyle>
+						<ListView.View>
+							<GridView ColumnHeaderContainerStyle="{DynamicResource noHeaderStyle}">
+								<GridViewColumn Header="Name" DisplayMemberBinding="{Binding FirstName}" Width="80"/>
+								<GridViewColumn Header="DateOfBirth" DisplayMemberBinding="{Binding DateOfBirth, Converter={StaticResource dateConverter}, ConverterParameter='dd MMM yyyy'}" Width="130"/>
+								<GridViewColumn Header="Age" DisplayMemberBinding="{Binding Age}" Width="50"/>
+							</GridView>
+						</ListView.View>
+					</ListView>
+				</StackPanel>
+			</StackPanel>
+		</ScrollViewer>
+
+		<Border Margin="5,5,5,0" Name="cnvEdit" Visibility="Hidden" Background="White" Grid.Row="2" Grid.Column="1" BorderBrush="LightGray" BorderThickness="3" CornerRadius="4" Height="198" VerticalAlignment="Top">
+			<Grid>
+				<Grid.RowDefinitions>
+					<RowDefinition Height="168*" />
+					<RowDefinition Height="30" />
+				</Grid.RowDefinitions>
+				<TextBox Name="txtEdit" FontSize="12" AcceptsReturn="True" KeyUp="txtEdit_KeyUp" />
+				<Button Name="btnEditOK" Click="btnEditOK_Click" Margin="0,4,6,2" Grid.Row="1" HorizontalAlignment="Right" Width="58">Save</Button>
+				<Button Name="btnEditCancel" Click="btnEditCancel_Click" Margin="0,4,79,2" Grid.Row="1" HorizontalAlignment="Right" Width="58">Cancel</Button>
+			</Grid>
+		</Border>
+
+		<Button HorizontalAlignment="Left" Margin="5,7,0,7" Name="btnMerge" Width="47" Click="btnMerge_Click" Grid.Row="3">Merge</Button>
+		<Button HorizontalAlignment="Left" Margin="58,7,0,7" Name="btnSplit" Width="47" Click="btnSplit_Click" Grid.Row="3">Split</Button>
+		<Button Margin="114,7,0,7" Name="btnDelete" Click="btnDelete_Click" Grid.Row="3" HorizontalAlignment="Left" Width="47">Delete</Button>
+		<Label Grid.Row="3" Margin="0,9,257,0" Name="label1" HorizontalAlignment="Right" Width="41.803">Filter</Label>
+		<TextBox Grid.Row="3" Margin="0,9,183,5" Name="txtFilter" KeyUp="txtFilter_KeyUp" HorizontalAlignment="Right" Width="76.803" Style="{DynamicResource HighlightFilterOn}"/>
+		<Button Grid.Row="3" Margin="0,9.138,102,4.862" Name="btnClearFilter" Click="btnClearFilter_Click" HorizontalAlignment="Right" Width="75">Clear</Button>
+		<Label Grid.Row="3" HorizontalAlignment="Right" Margin="0,9,67,0" Name="lblShown" Width="35" Content="{Binding ElementName=listView,Path=Items.Count}" FontWeight="Bold" HorizontalContentAlignment="Right" />
+		<Label Grid.Row="3" Margin="0,9,54,0" Name="label2" FontWeight="Bold" HorizontalAlignment="Right" Width="15">/</Label>
+		<Label Grid.Row="3" Margin="0,9,23,0" Name="lblTotal" Content="{Binding Count}" HorizontalAlignment="Right" Width="36" FontWeight="Bold"/>
+		<Button Margin="0,7,118,6" Name="btnCopy" Grid.Column="1" Grid.Row="1" Click="btnCopy_Click" HorizontalAlignment="Right" Width="47.197">Copy</Button>
+	</Grid>
+</Window>

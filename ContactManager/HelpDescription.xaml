@@ -1,0 +1,9 @@
+﻿<Window x:Class="ContactManager.HelpDescription"
+    xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+    xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+    Icon="pack://application:,,,/Resources/ContactManager.ico"
+    Title="Brief introduction to ContactManager" Height="449" Width="716" Closed="Window_Closed">
+    <Grid Name="grid1">
+        <WebBrowser Name="webBrowser1" Margin="5"/>
+    </Grid>
+</Window>

@@ -1,0 +1,227 @@
+﻿<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.0 Transitional//EN">
+<html>
+	<head>
+		<title></title>
+		<style type="text/css">
+				body {font-family:verdana}
+				.style1
+						{
+								font-family: "Courier New", Courier, monospace;
+						}
+				.style2
+						{
+								text-decoration: underline;
+						}
+				.style3
+						{
+								font-size: x-small;
+						}
+				.style4
+						{
+								font-style: italic;
+								text-decoration: underline;
+						}
+		</style>
+	</head>
+	<body>
+	
+			<h2>
+						ContactManager</h2>
+				<h3>
+						Description</h3>
+				<p>
+						<b>ContactManager</b> was born out of a frustration with Outlook and Gmail 
+						contact management, which don&#39;t include the notion of &#39;household&#39; - 
+						this 
+						makes it difficult to manage (for example) a family&#39;s address, at the same time 
+						as individual mobile phone numbers.</p>
+				<p>
+						<b>ContactManager</b> is very basic: it doesn&#39;t send or receive emails, doesn&#39;t 
+						do mail merges. All it does is manage contacts, and people. A contact can be a 
+						business, or a family. Each contact can &#39;contain&#39; zero or more people. There 
+						are 
+						a limited number of fields that <b>ContactManager</b> knows about (address, phone 
+						number, email, birthday etc.). Anything else can be added to the &#39;Notes&#39; field. </p>
+				<h3>
+						Getting Started</h3>
+				<p>
+						To create a new contact, click the &#39;New...&#39; button. In the field which appears, 
+						simply type the name and address of the contact:</p>
+				<p class="style1">
+						Bill &amp; Jane Dobbs<br />
+						23 Calverley Hill<br />
+						Reading<br />
+						RG5 2LP<br />
+						0867 8498 4513<br />
+						billandjane@mail.com</p>
+				<p>
+						<b>ContactManager</b> will interpret the first line as the name, and will 
+						recognise names in the form &quot;Bill &amp; Jane&quot; as being two people (and Bill, Jane &amp; 
+						Tim as three people, etc..). A line containing just numbers will be interpreted 
+						as a phone number. A line with an &#39;@&#39; symbol will be interpreted as an email 
+						address</p>
+				<p>
+						Note that you only <span class="style2">have</span> to enter the name part. The 
+						other parts are optional.</p>
+				<p>
+						You can also &#39;quick edit&#39; an existing contact in the same way, by clicking on 
+						the &#39;Edit...&#39; button.</p>
+	
+			<h3>
+						&#39;Advanced&#39; edition</h3>
+				<p>
+						To edit more details of a contact, click on the &#39;Details...&#39; button. Here it is 
+						possible to add/remove/reorder people, and include extra details. Note that the 
+						date format for birth dates is currently (dd.mm.yyyy). The little check box in 
+						front of each person indicates whether the person&#39;s first name is included in 
+						the display name for the contact as a whole.</p>
+				<p>
+						The &#39;Is business&#39; checkbox is used by <b>ContactManager</b> to determine how to 
+						generate the display name of the Contact.</p>
+				<p>
+						To delete a contact, use the &#39;Delete...&#39; button at the bottom of the main 
+						window. Note that there is no &#39;are you sure?&#39; confirmation - as you can easily 
+						undo the delete action from the Edition -&gt; Undo menu. In fact, all modifications 
+						can be undone/redone, as in any standard application.</p>
+				<p>
+						It is also possible to merge several contacts together, or to split an existing 
+						contact into one contact for each person. Experiment with this functionality to 
+						get a better idea of how to use it (remember, you can always undo).<i> (Tip: 
+						when merging, the order in which you select the contacts (Ctrl-Click to select 
+						multiple contacts) determines the order in which the people will be included in 
+						the merged contact).</i></p>
+				<h3>
+						Searching</h3>
+				<p>
+						The filter button at the bottom of the main window performs a basic single-word 
+						search on all fields of contacts and associated people.</p>
+				<h3>
+						Birthdays</h3>
+				<p>
+						On startup, the application displays a &#39;Upcoming birthdays&#39; window, with 
+						birthdays in the next N days. The slider can be used to modify the number of 
+						days. It is also possible to use the text field to filter (on people fields), 
+						and to limit to decade birthdays.</p>
+				<h3>
+						Backups</h3>
+				<p>
+						<b>ContactManager</b> is designed to be very &#39;safe&#39;. Combined with the Undo 
+						functionality, <b>ContactManager</b> archives a dated &#39;backup&#39; copy of your address 
+						book every time you save changes. In case of error, it is possible to load 
+						previous versions.</p>
+				<p>
+						The default file name format for these backup files is (for example):
+						<span class="style1">09.09.2009@09.09.09 AddressBook.xml</span></p>
+				<h3>
+						Import/Export</h3>
+				<p>
+						<b>ContactManager</b> can import and export files in several different formats. 
+						However, note that these functions are mostly not symmetrical (the only format 
+						that <b>ContactManager</b> can import and export is its own AddressBook xml 
+						format).</p>
+				<p>
+						Currently, the .csv <span class="style4">import</span> functions are limited to semi-colon (;) separated 
+						files. (Comma separated files are a bit too complicated). This may present some 
+						problems depending on your &#39;regional settings&#39;. (One not-very-elegant solution 
+						is to modify your computer&#39;s regional settings, import the file into excel, the 
+						change the regional settings and save back to csv.)</p>
+				<p>
+						As with the add function, <b>ContactManager</b> will attempt to interpret the 
+						name as one or more people. Depending on the number of people, the presence or 
+						not of home &amp; work phone numbers and email addresses, <b>ContactManager</b> will 
+						make a guess on whether the contact is a business or not, and on whether the 
+						email addresses are personal or for the contact as a whole.</p>
+				<p>
+						The different .csv functions relate to the names of the rows that <b>
+						ContactManager</b> expects to find in the file:</p>
+				<p>
+						<b>Outlook import:</b></p>
+				<blockquote>
+						<span class="style3">First Name</span><br class="style3" />
+						<span class="style3">Last Name </span>
+						<br class="style3" />
+						<span class="style3">Street </span>
+						<br class="style3" />
+						<span class="style3">City </span>
+						<br class="style3" />
+						<span class="style3">State </span>
+						<br class="style3" />
+						<span class="style3">Postal Code </span>
+						<br class="style3" />
+						<span class="style3">Country/Region </span>
+						<br class="style3" />
+						<span class="style3">Business Phone </span>
+						<br class="style3" />
+						<span class="style3">Home Phone </span>
+						<br class="style3" />
+						<span class="style3">Mobile Phone </span>
+						<br class="style3" />
+						<span class="style3">Other Phone </span>
+						<br class="style3" />
+						<span class="style3">E-mail Address </span>
+						<br class="style3" />
+						<span class="style3">E-mail 2 Address </span></blockquote>
+				<p style="font-weight: 700">
+						Generic import:</p>
+				<blockquote>
+						<span class="style3">BirthDate </span>
+						<br class="style3" />
+						<span class="style3">BirthDay </span>
+						<br class="style3" />
+						<span class="style3">BirthMonth </span>
+						<br class="style3" />
+						<span class="style3">BirthYear </span>
+						<br class="style3" />
+						<span class="style3">FirstName </span>
+						<br class="style3" />
+						<span class="style3">LastName </span>
+						<br class="style3" />
+						<span class="style3">Street1 </span>
+						<br class="style3" />
+						<span class="style3">Street2 </span>
+						<br class="style3" />
+						<span class="style3">City </span>
+						<br class="style3" />
+						<span class="style3">PostCode </span>
+						<br class="style3" />
+						<span class="style3">State </span>
+						<br class="style3" />
+						<span class="style3">Country </span>
+						<br class="style3" />
+						<span class="style3">HomePhone </span>
+						<br class="style3" />
+						<span class="style3">MobilePhone </span>
+						<br class="style3" />
+						<span class="style3">WorkPhone </span>
+						<br class="style3" />
+						<span class="style3">OtherPhone </span>
+						<br class="style3" />
+						<span class="style3">Email1 </span>
+						<br class="style3" />
+						<span class="style3">Email2 </span>
+						<br class="style3" />
+						<span class="style3">Notes</span> </blockquote>
+	
+			<h3>
+						Export</h3>
+				<p>
+						The export functions are fairly straightforward. One important thing to note is 
+						that exports operate on the <b>filtered</b> list. This is useful for exporting a 
+						sub-set of your contacts.</p>
+				<p>
+						(Note: the exported csv files use the separator defined in your computer&#39;s 
+						regional settings.)</p>
+				<h3>
+						Future development</h3>
+				<ul>
+						<li>Permit localised date formats</li>
+						<li>Permit comma-separated csv</li>
+						<li>Improve usability (tool tips etc.)</li>
+						<li>Add keyboard shortcuts (undo/redo/save etc.)</li>
+						<li>Introduce notion of &#39;archive/hide&#39; (instead of delete)</li>
+						<li>Categories?</li>
+						<li>Localise texts (for other languages)</li>
+				</ul>
+	
+	</body>
+</html>
